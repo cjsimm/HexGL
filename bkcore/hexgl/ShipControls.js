@@ -51,6 +51,7 @@ bkcore.hexgl.ShipControls = function(ctx)
 	this.speed = 0.0;
 	this.speedRatio = 0.0;
 	this.boost = 0.0;
+	this.onBoostPad = false;
 	this.shield = 1.0;
 	this.angular = 0.0;
 
@@ -310,6 +311,7 @@ bkcore.hexgl.ShipControls.prototype.reset = function(position, rotation)
 	this.speed = 0.0;
 	this.speedRatio = 0.0;
 	this.boost = 0.0;
+	this.onBoostPad = false;
 	this.shield = this.maxShield;
 	this.destroyed = false;
 
@@ -598,10 +600,13 @@ bkcore.hexgl.ShipControls.prototype.boosterCheck = function(dt)
 
 	var color = this.collisionMap.getPixel(x, z);
 
-	if(color.r == 255 && color.g < 127 && color.b < 127) {
+	var onBoostPad = color.r == 255 && color.g < 127 && color.b < 127;
+	if(onBoostPad) {
 		bkcore.Audio.play('boost');
 		this.boost = this.boosterSpeed;
+		if(!this.onBoostPad) this.shield = Math.max(0, this.shield - 0.2);
 	}
+	this.onBoostPad = onBoostPad;
 
 	this.movement.z += this.boost * dt;
 }
