@@ -1,6 +1,19 @@
 // Supervisor pause keeps the native RAF alive without advancing the race.
 (function () {
   'use strict';
+  if (new URLSearchParams(window.location.search).get('camera') === 'high') {
+    var init = bkcore.hexgl.HexGL.prototype.init;
+    bkcore.hexgl.HexGL.prototype.init = function () {
+      init.call(this);
+      this.components.cameraChase.yoffset = 18;
+      this.components.cameraChase.zoffset = 25;
+      this.components.cameraChase.viewOffset = 35;
+      var badge = document.createElement('div');
+      badge.textContent = 'High chase camera adaptation';
+      badge.style.cssText = 'position:absolute;left:12px;top:90px;z-index:10000;pointer-events:none;padding:4px 8px;background:#111b;color:white;font:12px sans-serif';
+      this.containers.main.appendChild(badge);
+    };
+  }
   var paused = false;
   var pausedAt = 0;
   var update = bkcore.hexgl.HexGL.prototype.update;
