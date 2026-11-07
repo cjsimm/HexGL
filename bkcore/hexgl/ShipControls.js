@@ -52,6 +52,7 @@ bkcore.hexgl.ShipControls = function(ctx)
 	this.speedRatio = 0.0;
 	this.boost = 0.0;
 	this.shield = 1.0;
+	this.accelerationDamageApplied = false;
 	this.angular = 0.0;
 
 	this.currentVelocity = new THREE.Vector3();
@@ -311,6 +312,7 @@ bkcore.hexgl.ShipControls.prototype.reset = function(position, rotation)
 	this.speedRatio = 0.0;
 	this.boost = 0.0;
 	this.shield = this.maxShield;
+	this.accelerationDamageApplied = false;
 	this.destroyed = false;
 
 	this.dummy.position.copy(position);
@@ -488,7 +490,12 @@ bkcore.hexgl.ShipControls.prototype.update = function(dt)
 
 	this.currentVelocity.copy(this.dummy.position).subSelf(this.collisionPreviousPosition);
 
-	this.collisionCheck(dt);
+	var collided = this.collisionCheck(dt);
+	if(this.active && this.key.forward && this.speed >= 0.8 &&
+		!this.accelerationDamageApplied && collided === false) {
+		this.shield = Math.max(0, this.shield - 0.2);
+		this.accelerationDamageApplied = true;
+	}
 
 	this.quaternion.set(this.rotation.x, this.rotation.y, this.rotation.z, 1).normalize();
 	this.dummy.quaternion.multiplySelf(this.quaternion);
